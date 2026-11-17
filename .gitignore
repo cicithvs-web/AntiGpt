@@ -1,0 +1,9 @@
+node_modules/
+.env
+.env.*
+!.env.example
+dist/
+server/sessions/
+server/auth-backup/
+
+server/uploads/
