@@ -58,10 +58,15 @@ app.get('/api/status', (req, res) => {
 });
 
 // ---------- MODELS (agy models) ----------
-let modelsCache = null;
+// Cache per akun: ganti akun (login/logout) → daftar model diambil ulang otomatis.
+// Daftar kosong tidak di-cache (misal saat belum login), supaya dicoba lagi berikutnya.
+let modelsCache = { email: undefined, models: null };
 app.get('/api/models', (req, res) => {
-  if (!modelsCache || req.query.refresh) modelsCache = agy.listModels();
-  res.json({ ok: true, models: modelsCache, default: agy.DEFAULT_MODEL });
+  const email = agy.whoamiEmail() || null;
+  if (req.query.refresh || modelsCache.email !== email || !modelsCache.models?.length) {
+    modelsCache = { email, models: agy.listModels() };
+  }
+  res.json({ ok: true, email, models: modelsCache.models, default: agy.DEFAULT_MODEL });
 });
 
 // ---------- CHAT ----------
